@@ -67,6 +67,7 @@ namespace SmartProjectReloader
             UnloadAllProjectsCommand.Initialize(this);
             ReloadProjectWithReferencesCommand.Initialize(this);
             base.Initialize();
+            ReloadAllProjectsCommand.Initialize(this);
         }
 
         #endregion
@@ -87,6 +88,43 @@ namespace SmartProjectReloader
             }
         }
 
+        public void ReloadAllProjects()
+        {
+            var solution = (IVsSolution)GetService(typeof(SVsSolution));
+            if (solution == null) return;
+            var solution4 = (IVsSolution4)solution;
+
+            foreach (var project in GetUnloadedProjects())
+            {
+                solution.GetGuidOfProject(project, out var guid);
+                solution4.ReloadProject(ref guid);
+            }
+        }
+
+        public void ReloadSelectedProjectsWithReferences()
+        {
+            var solution = (IVsSolution)GetService(typeof(SVsSolution));
+            if (solution == null) return;
+            var solution4 = (IVsSolution4)solution;
+
+            var selectedProject = GetSelectedProjectHierarchy();
+            selectedProject.GetCanonicalName((uint)VSConstants.VSITEMID.Root, out var selectedProjectFilePath);
+
+            var reloadProjectFiles = new HashSet<string>();
+            GetReferenceProjectFilesRecursive(selectedProjectFilePath, reloadProjectFiles);
+            reloadProjectFiles.Add(selectedProjectFilePath);
+
+            var unloadedProjects = GetUnloadedProjectHierarchiesWithFilePath();
+            foreach (var reloadProjectFile in reloadProjectFiles)
+            {
+                if (unloadedProjects.TryGetValue(reloadProjectFile, out var reloadProject))
+                {
+                    solution.GetGuidOfProject(reloadProject, out var guid);
+                    solution4.ReloadProject(ref guid);
+                }
+            }
+        }
+
         private IVsHierarchy GetSelectedProjectHierarchy()
         {
             var selectionMonitor = GetService(typeof(SVsShellMonitorSelection)) as IVsMonitorSelection;
@@ -100,10 +138,10 @@ namespace SmartProjectReloader
             return (IVsHierarchy)Marshal.GetTypedObjectForIUnknown(hierarchyPtr, typeof(IVsHierarchy));
         }
 
-        private IDictionary<string, IVsHierarchy> GetUnloadedProjectHierarchiesWithFilePath()
+        private IEnumerable<IVsHierarchy> GetUnloadedProjects()
         {
             var solution = (IVsSolution)GetService(typeof(SVsSolution));
-            if (solution == null) return null;
+            if (solution == null) yield break;
 
             var results = new Dictionary<string, IVsHierarchy>();
             var guid = Guid.Empty;
@@ -112,11 +150,12 @@ namespace SmartProjectReloader
             for (enumerator.Reset(); enumerator.Next(1, hierarchy, out var fetched) == VSConstants.S_OK && fetched == 1;)
             {
                 hierarchy[0].GetCanonicalName((uint)VSConstants.VSITEMID.Root, out var projFileName);
-                results[projFileName] = hierarchy[0];
+                yield return hierarchy[0];
             }
-
-            return results;
         }
+
+        private IDictionary<string, IVsHierarchy> GetUnloadedProjectHierarchiesWithFilePath()
+            => GetUnloadedProjects().ToDictionary(proj => { proj.GetCanonicalName((uint)VSConstants.VSITEMID.Root, out var projFileName); return projFileName; });
 
         private void GetReferenceProjectFilesRecursive(string projectFile, HashSet<string> referenceProjectFiles, ProjectCollection projectCollection = null)
         {
@@ -143,30 +182,6 @@ namespace SmartProjectReloader
             finally
             {
                 if (requiresDispose) projectCollection.Dispose();
-            }
-        }
-
-        public void ReloadSelectedProjectsWithReferences()
-        {
-            var solution = (IVsSolution)GetService(typeof(SVsSolution));
-            if (solution == null) return;
-            var solution4 = (IVsSolution4)solution;
-
-            var selectedProject = GetSelectedProjectHierarchy();
-            selectedProject.GetCanonicalName((uint)VSConstants.VSITEMID.Root, out var selectedProjectFilePath);
-
-            var reloadProjectFiles = new HashSet<string>();
-            GetReferenceProjectFilesRecursive(selectedProjectFilePath, reloadProjectFiles);
-            reloadProjectFiles.Add(selectedProjectFilePath);
-
-            var unloadedProjects = GetUnloadedProjectHierarchiesWithFilePath();
-            foreach (var reloadProjectFile in reloadProjectFiles)
-            {
-                if (unloadedProjects.TryGetValue(reloadProjectFile, out var reloadProject))
-                {
-                    solution.GetGuidOfProject(reloadProject, out var guid);
-                    solution4.ReloadProject(ref guid);
-                }
             }
         }
     }

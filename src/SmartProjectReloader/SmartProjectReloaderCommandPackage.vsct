@@ -42,7 +42,7 @@
 		<Group guid="guidSmartProjectReloaderCommandPackageProjectCmdSet" id="MyStubProjectMenuGroup" priority="0x0600">
 			<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_STUBPROJECT" />
 		</Group>
-	</Groups>
+    </Groups>
 
     <!--Buttons section. -->
     <!--This section defines the elements the user can interact with, like a menu command or a button
@@ -63,7 +63,7 @@
         </Strings>
       </Button>
 
-		<Button guid="guidSmartProjectReloaderCommandPackageProjectCmdSet" id="ReloadProjectWithReferencesCommandId" priority="0x0100" type="Button">
+		<Button guid="guidSmartProjectReloaderCommandPackageProjectCmdSet" id="ReloadProjectWithReferencesCommandId" priority="0x0101" type="Button">
 			<Parent guid="guidSmartProjectReloaderCommandPackageProjectCmdSet" id="MyStubProjectMenuGroup" />
 			<Icon guid="guidImages1" id="bmpPic1" />
 			<Strings>
@@ -71,7 +71,14 @@
 			</Strings>
 		</Button>
 
-	</Buttons>
+	  <Button guid="guidSmartProjectReloaderCommandPackageSolutionCmdSet" id="ReloadAllProjectsCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidSmartProjectReloaderCommandPackageSolutionCmdSet" id="MySolutionMenuGroup" />
+        <Icon guid="guidImages2" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Reload all projects</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
 
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
     <Bitmaps>
@@ -82,6 +89,7 @@
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
       <Bitmap guid="guidImages" href="Resources\ReloadProjectWithReferencesCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
       <Bitmap guid="guidImages1" href="Resources\UnloadAllProjectsCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages2" href="Resources\ReloadAllProjects.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
     </Bitmaps>
   </Commands>
 
@@ -93,7 +101,8 @@
     <GuidSymbol name="guidSmartProjectReloaderCommandPackageSolutionCmdSet" value="{9449a163-323a-420f-a09d-561b0e5f8a64}">
       <IDSymbol name="MySolutionMenuGroup" value="0x1020" />
       <IDSymbol name="UnloadAllProjectsCommandId" value="4129" />
-    </GuidSymbol>
+	  <IDSymbol name="ReloadAllProjectsCommandId" value="4131" />
+	</GuidSymbol>
 
 	  <GuidSymbol name="guidSmartProjectReloaderCommandPackageProjectCmdSet" value="{9449a163-323a-420f-a09d-561b0e5f8a65}">
 		  <IDSymbol name="MyStubProjectMenuGroup" value="0x1021" />
@@ -110,6 +119,15 @@
     </GuidSymbol>
   
     <GuidSymbol name="guidImages1" value="{ca0bed8a-94a8-4845-a7b5-c7019499390b}">
+      <IDSymbol name="bmpPic1" value="1" />
+      <IDSymbol name="bmpPic2" value="2" />
+      <IDSymbol name="bmpPicSearch" value="3" />
+      <IDSymbol name="bmpPicX" value="4" />
+      <IDSymbol name="bmpPicArrows" value="5" />
+      <IDSymbol name="bmpPicStrikethrough" value="6" />
+    </GuidSymbol>
+  
+    <GuidSymbol value="{829a98c7-9c4d-4567-b20a-62aca36d7227}" name="guidImages2">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
