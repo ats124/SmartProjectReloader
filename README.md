@@ -1,0 +1,2 @@
+# SmartProjectReloader
+開発対象のプロジェクトと参照しているプロジェクトのみを簡単にロードできるようにしたVisual Studio拡張。
