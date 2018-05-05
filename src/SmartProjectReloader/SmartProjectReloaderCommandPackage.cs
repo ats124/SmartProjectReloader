@@ -100,14 +100,14 @@ namespace SmartProjectReloader
             return (IVsHierarchy)Marshal.GetTypedObjectForIUnknown(hierarchyPtr, typeof(IVsHierarchy));
         }
 
-        private IDictionary<string, IVsHierarchy> GetProjectHierarchiesWithFilePath()
+        private IDictionary<string, IVsHierarchy> GetUnloadedProjectHierarchiesWithFilePath()
         {
             var solution = (IVsSolution)GetService(typeof(SVsSolution));
             if (solution == null) return null;
 
             var results = new Dictionary<string, IVsHierarchy>();
             var guid = Guid.Empty;
-            solution.GetProjectEnum((uint)__VSENUMPROJFLAGS.EPF_ALLINSOLUTION, ref guid, out var enumerator);
+            solution.GetProjectEnum((uint)__VSENUMPROJFLAGS.EPF_UNLOADEDINSOLUTION, ref guid, out var enumerator);
             IVsHierarchy[] hierarchy = new IVsHierarchy[1] { null };
             for (enumerator.Reset(); enumerator.Next(1, hierarchy, out var fetched) == VSConstants.S_OK && fetched == 1;)
             {
@@ -158,12 +158,14 @@ namespace SmartProjectReloader
             var reloadProjectFiles = new HashSet<string>() { selectedProjectFilePath };
             GetReferenceProjectFilesRecursive(selectedProjectFilePath, reloadProjectFiles);
 
-            var projects = GetProjectHierarchiesWithFilePath();
+            var unloadedProjects = GetUnloadedProjectHierarchiesWithFilePath();
             foreach (var reloadProjectFile in reloadProjectFiles)
             {
-                var reloadProject = projects[reloadProjectFile];
-                solution.GetGuidOfProject(reloadProject, out var guid);
-                solution4.ReloadProject(ref guid);
+                if (unloadedProjects.TryGetValue(reloadProjectFile, out var reloadProject))
+                {
+                    solution.GetGuidOfProject(reloadProject, out var guid);
+                    solution4.ReloadProject(ref guid);
+                }
             }
         }
     }
