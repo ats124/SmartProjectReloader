@@ -155,8 +155,9 @@ namespace SmartProjectReloader
             var selectedProject = GetSelectedProjectHierarchy();
             selectedProject.GetCanonicalName((uint)VSConstants.VSITEMID.Root, out var selectedProjectFilePath);
 
-            var reloadProjectFiles = new HashSet<string>() { selectedProjectFilePath };
+            var reloadProjectFiles = new HashSet<string>();
             GetReferenceProjectFilesRecursive(selectedProjectFilePath, reloadProjectFiles);
+            reloadProjectFiles.Add(selectedProjectFilePath);
 
             var unloadedProjects = GetUnloadedProjectHierarchiesWithFilePath();
             foreach (var reloadProjectFile in reloadProjectFiles)
