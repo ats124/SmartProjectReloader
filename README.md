@@ -3,3 +3,7 @@
 
 ## DEMO
 ![デモ動画](demo.gif)
+
+## インストール手順
+以下から「SmartProjectReloader.vsix」をダウンロードして、実行する。
+https://github.com/ats124/SmartProjectReloader/releases
