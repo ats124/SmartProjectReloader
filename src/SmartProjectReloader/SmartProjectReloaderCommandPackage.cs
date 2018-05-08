@@ -173,9 +173,12 @@ namespace SmartProjectReloader
                 foreach (var refereceProjectPropItem in proj.Items.Where(item => item.ItemType == "ProjectReference"))
                 {
                     var refProjFile = new Uri(baseUri, refereceProjectPropItem.EvaluatedInclude).LocalPath;
-                    if (referenceProjectFiles.Add(refProjFile))
+                    if (File.Exists(refProjFile))
                     {
-                        GetReferenceProjectFilesRecursive(refProjFile, referenceProjectFiles, projectCollection);
+                        if (referenceProjectFiles.Add(refProjFile))
+                        {
+                            GetReferenceProjectFilesRecursive(refProjFile, referenceProjectFiles, projectCollection);
+                        }
                     }
                 }
             }
